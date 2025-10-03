@@ -111,7 +111,7 @@ namespace myactuator_rmd {
 
   template <std::uint32_t SEND_ID_OFFSET, std::uint32_t RECEIVE_ID_OFFSET>
   CanNode<SEND_ID_OFFSET,RECEIVE_ID_OFFSET>::CanNode(std::string const& ifname)
-  : can::Node{ifname}, Driver{} {
+  : can::Node{ifname, std::chrono::seconds(1), std::chrono::seconds(1), false}, Driver{} {
     return;
   }
 
