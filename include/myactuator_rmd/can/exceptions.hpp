@@ -46,6 +46,15 @@ namespace myactuator_rmd {
         using Exception::Exception;
     };
 
+    /**
+     * @brief Exception for a timeout when receiving a CAN frame
+     * 
+     */
+    class RxTimeoutError: public Exception {
+      public:
+        using Exception::Exception;
+    };
+
     /**\class LostArbitrationError
      * \brief
      *    Exception class for arbitration errors, may often be safely ignored

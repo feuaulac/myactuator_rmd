@@ -25,6 +25,7 @@
 #include <unistd.h>
 
 #include "myactuator_rmd/can/exceptions.hpp"
+#include "myactuator_rmd/can/exceptions.hpp"
 #include "myactuator_rmd/can/frame.hpp"
 #include "myactuator_rmd/can/utilities.hpp"
 
@@ -105,6 +106,9 @@ namespace myactuator_rmd {
     Frame Node::read() const {
       struct ::can_frame frame {};
       if (::read(socket_, &frame, sizeof(struct ::can_frame)) < 0) {
+        if ((errno == EAGAIN) || (errno == EWOULDBLOCK)) {
+          throw RxTimeoutError("Interface '" + ifname_ + "' - Could not read CAN frame: Timeout");
+        }
         throw SocketException(errno, std::generic_category(), "Interface '" + ifname_ + "' - Could not read CAN frame");
       }
       // We will only receive these frames if the corresponding error mask is set

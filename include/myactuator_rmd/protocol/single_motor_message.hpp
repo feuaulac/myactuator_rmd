@@ -50,7 +50,11 @@ namespace myactuator_rmd {
   template <CommandType C>
   constexpr SingleMotorMessage<C>::SingleMotorMessage(std::array<std::uint8_t,8> const& data)
   : Message{data} {
-    if (data[0] != C) {
+    if (data[0] == 0xf1) {
+    // Motors sometime send this command. No ideas what it is. skip!
+    return;
+  }
+  if (data[0] != C) {
       std::stringstream ss {};
       ss << std::showbase << std::hex << static_cast<std::uint16_t>(data[0]);
       throw ProtocolException("Unexpected response '" + ss.str() + "'");
