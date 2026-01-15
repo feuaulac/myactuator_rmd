@@ -139,9 +139,18 @@ namespace myactuator_rmd {
   template <std::uint32_t SEND_ID_OFFSET, std::uint32_t RECEIVE_ID_OFFSET>
   std::array<std::uint8_t,8> CanNode<SEND_ID_OFFSET,RECEIVE_ID_OFFSET>::sendRecv(Message const& request, std::uint32_t const actuator_id) {
     auto const can_send_id {getCanSendId(actuator_id)};
+    auto const expected_recv_id {getCanReceiveId(actuator_id)};
     write(can_send_id, request.getData());
-    can::Frame const frame {can::Node::read()};
-    return frame.getData();
+    // Keep reading until we get a response from the correct motor
+    // This handles cases where responses arrive out of order
+    while (true) {
+      can::Frame const frame {can::Node::read()};
+      if (frame.getId() == expected_recv_id) {
+        return frame.getData();
+      }
+      // Received response from a different motor - discard and keep waiting
+      // The timeout on read() will eventually trigger if the expected response never arrives
+    }
   }
 
   template <std::uint32_t SEND_ID_OFFSET, std::uint32_t RECEIVE_ID_OFFSET>
